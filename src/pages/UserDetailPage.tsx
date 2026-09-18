@@ -1,8 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Pencil } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import type { User } from '../types';
-import { userService } from '../services/userService';
+import { useUser } from '../hooks/useUser';
 import { AppLink } from '../components/shared/Link';
 import { Button } from '../components/shared/Button';
 import { Info } from '../components/shared/Info';
@@ -14,23 +12,16 @@ const page = 'mx-auto w-full max-w-[1180px] px-[6%] py-[62px] max-sm:px-5 max-sm
 const narrow = `${page} max-w-[950px]`;
 
 export function UserDetailsPage() {
-  const { id = '' } = useParams(),
-    navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState('');
-  useEffect(() => {
-    userService
-      .getUserById(id)
-      .then(setUser)
-      .catch((reason) => setError(reason instanceof Error ? reason.message : 'User not found.'));
-  }, [id]);
-  if (error)
+  const { id = '' } = useParams();
+  const navigate = useNavigate();
+  const { data: user, error, isLoading } = useUser(id);
+  if (error || (!isLoading && !user))
     return (
       <section className={page}>
-        <ErrorState message={error} retry={() => navigate('/users')} />
+        <ErrorState message={error instanceof Error ? error.message : 'User not found.'} retry={() => navigate('/users')} />
       </section>
     );
-  if (!user)
+  if (isLoading || !user)
     return (
       <section className={page}>
         <LoadingState />

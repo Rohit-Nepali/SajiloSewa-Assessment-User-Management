@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, Check, Plus } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { UserInput } from '../types';
-import { userService } from '../services/userService';
+import { useForm } from 'react-hook-form';
+import { useUser } from '../hooks/useUser';
+import { useCreateUser, useUpdateUser } from '../hooks/useUserMutations';
+import { formValuesToUserInput, userFieldRules, userFormDefaults, userToFormValues, type UserFormValues } from '../forms/userForm';
 import { LoadingState } from '../components/common/States';
 import { AppLink } from '../components/shared/Link';
 import { FormField } from '../components/shared/FormField';
@@ -17,69 +19,36 @@ const narrow = `${page} max-w-[950px]`;
 export function UserFormPage({ edit = false }: { edit?: boolean }) {
   const { id = '' } = useParams(),
     navigate = useNavigate();
-  const [initial, setInitial] = useState<Partial<UserInput>>({});
-  const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    username: '',
-    gender: 'female',
-    age: 25,
-    company: '',
+  const userQuery = useUser(edit ? id : '');
+  const createUser = useCreateUser();
+  const updateUser = useUpdateUser();
+  const [error, setError] = useState('');
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<UserFormValues>({
+    defaultValues: userFormDefaults,
   });
 
-  const [loading, setLoading] = useState(edit),
-    [saving, setSaving] = useState(false),
-    [error, setError] = useState('');
-
   useEffect(() => {
-    if (edit)
-      userService
-        .getUserById(id)
-        .then((user) => {
-          setInitial(user);
-          setForm({
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            phone: user.phone,
-            username: user.username,
-            gender: user.gender,
-            age: user.age,
-            company: user.company.name,
-          });
-        })
-        .catch(() => setError('This user could not be found.'))
-        .finally(() => setLoading(false));
-  }, [edit, id]);
+    if (!userQuery.data) return;
+    // RHF defaults are read once, so reset when async edit data arrives.
+    reset(userToFormValues(userQuery.data));
+  }, [reset, userQuery.data]);
 
-  const submit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const submit = (values: UserFormValues) => {
     setError('');
-    if (!form.firstName || !form.lastName || !/^[^@]+@[^@]+\.[^@]+$/.test(form.email)) {
-      setError('Enter a first name, last name, and valid email.');
-      return;
-    }
-
-    const payload: UserInput = {
-      ...form,
-      company: {
-        name: form.company,
-        title: initial.company?.title ?? 'Team member',
-        department: initial.company?.department ?? 'General',
-      },
-    };
-    setSaving(true);
-
-    const request = edit ? userService.updateUser(id, payload) : userService.createUser(payload);
+    const payload = formValuesToUserInput(values, userQuery.data);
+    const request = edit
+      ? updateUser.mutateAsync({ id, data: payload })
+      : createUser.mutateAsync(payload);
     request
       .then((user) => navigate(`/users/${user.id}`))
       .catch((reason) =>
         setError(reason instanceof Error ? reason.message : 'Could not save user.'),
-      )
-      .finally(() => setSaving(false));
+      );
   };
+
+  const loading = edit && userQuery.isLoading;
+  const saving = createUser.isPending || updateUser.isPending;
+  const loadError = userQuery.error ? 'This user could not be found.' : '';
 
   if (loading)
     return (
@@ -102,18 +71,18 @@ export function UserFormPage({ edit = false }: { edit?: boolean }) {
           Keep profile information accurate and useful for the whole team.
         </Typography>
       </div>
-      {error && (
+      {(error || loadError) && (
         <Typography
           className="mt-[25px] rounded-[6px] bg-[var(--danger-soft)] px-[15px] py-3"
           tone="danger"
           role="alert"
         >
-          {error}
+          {error || loadError}
         </Typography>
       )}
       <form
         className="mt-[35px] grid grid-cols-2 gap-5 rounded-lg border border-[var(--line)] bg-[var(--panel)] p-7 max-sm:grid-cols-1 max-sm:p-5"
-        onSubmit={submit}
+        onSubmit={handleSubmit(submit)}
       >
         {fields.map((field) => (
           <FormField
@@ -128,15 +97,14 @@ export function UserFormPage({ edit = false }: { edit?: boolean }) {
           >
             <Input
               type={field === 'email' ? 'email' : 'text'}
-              value={form[field]}
-              onChange={(event) => setForm({ ...form, [field]: event.target.value })}
+              {...register(field, field === 'firstName' ? userFieldRules.firstName : field === 'lastName' ? userFieldRules.lastName : field === 'email' ? userFieldRules.email : undefined)}
             />
+            {errors[field] && <Typography size="xs" tone="danger">{errors[field]?.message}</Typography>}
           </FormField>
         ))}
         <FormField label="Gender">
           <Select
-            value={form.gender}
-            onChange={(event) => setForm({ ...form, gender: event.target.value })}
+            {...register('gender')}
           >
             <option>female</option>
             <option>male</option>
@@ -147,9 +115,9 @@ export function UserFormPage({ edit = false }: { edit?: boolean }) {
             type="number"
             min="1"
             max="120"
-            value={form.age}
-            onChange={(event) => setForm({ ...form, age: Number(event.target.value) })}
+            {...register('age', { valueAsNumber: true, min: { value: 1, message: 'Age must be at least 1.' }, max: { value: 120, message: 'Age must be 120 or less.' } })}
           />
+          {errors.age && <Typography size="xs" tone="danger">{errors.age.message}</Typography>}
         </FormField>
         <div className="col-span-full mt-2 flex items-center justify-end gap-2.5 border-t border-[var(--line)] pt-5">
           <AppLink to="/users">
@@ -157,7 +125,7 @@ export function UserFormPage({ edit = false }: { edit?: boolean }) {
               Cancel
             </Button>
           </AppLink>
-          <Button disabled={saving}>
+          <Button disabled={saving} type="submit">
             {edit ? <Check size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
             {saving ? 'Saving...' : edit ? 'Save changes' : 'Create user'}
           </Button>

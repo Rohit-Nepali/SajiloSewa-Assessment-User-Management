@@ -1,38 +1,33 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { userService } from '../services/userService';
 import type { User } from '../types';
 
-export function useUsers(page: number, search: string, gender: string) {
-  const [users, setUsers] = useState<User[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+export const userQueryKeys = {
+  all: ['users'] as const,
+  lists: () => [...userQueryKeys.all, 'list'] as const,
+  list: (page: number, search: string, gender: string) =>
+    [...userQueryKeys.lists(), { page, search, gender }] as const,
+  details: () => [...userQueryKeys.all, 'detail'] as const,
+  detail: (id: string) => [...userQueryKeys.details(), id] as const,
+};
 
-  const fetchUsers = useCallback(() => {
-    setLoading(true);
-    setError('');
-    userService
-      .getUsers({
+export function useUsers(page: number, search: string, gender: string) {
+  const query = useQuery({
+    queryKey: userQueryKeys.list(page, search, gender),
+    queryFn: () =>
+      userService.getUsers({
         limit: 8,
         skip: (page - 1) * 8,
         search: search || undefined,
         gender: gender || undefined,
       })
-      .then((data) => {
-        setUsers(data.users);
-        setTotal(data.total);
-      })
-      .catch((reason) =>
-        setError(reason instanceof Error ? reason.message : 'Unable to load users.'),
-      )
-      .finally(() => setLoading(false));
-  }, [gender, page, search]);
+  });
 
-  useEffect(() => {
-    const request = async () => {
-      await fetchUsers();
-    };
-    void request();
-  }, [fetchUsers]);
-  return { users, total, loading, error, refetch: fetchUsers };
+  return {
+    users: query.data?.users ?? ([] as User[]),
+    total: query.data?.total ?? 0,
+    loading: query.isLoading,
+    error: query.error instanceof Error ? query.error.message : query.error ? 'Unable to load users.' : '',
+    refetch: query.refetch,
+  };
 }
