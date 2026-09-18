@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
+import { Pencil, Search, Trash2, UserPlus, X } from 'lucide-react';
 import { useUsers } from '../hooks/useUsers';
 import { useState } from 'react';
 import type { User } from '../types';
@@ -56,7 +57,7 @@ export function UserListPage() {
           </p>
         </div>
         <AppLink to="/users/new">
-          <Button>＋ Add user</Button>
+          <Button><UserPlus size={16} aria-hidden="true" /> Add user</Button>
         </AppLink>
       </div>
       <div className="my-6 mt-[55px] flex gap-20 border-y border-[var(--line)] py-5 max-sm:mt-[35px] max-sm:justify-between max-sm:gap-5">
@@ -69,7 +70,7 @@ export function UserListPage() {
       </div>
       <div className="mb-[25px] flex gap-2.5 max-sm:flex-wrap">
         <label className="flex min-w-0 flex-1 items-center gap-[9px] rounded-[7px] border border-[var(--line)] bg-[var(--panel)] px-[13px]">
-          <span className="text-2xl text-[var(--muted)]">⌕</span>
+          <Search size={19} className="shrink-0 text-[var(--muted)]" aria-hidden="true" />
           <Input
             aria-label="Search users"
             value={search}
@@ -90,7 +91,7 @@ export function UserListPage() {
         </Select>
         {(search || gender) && (
           <Button variant="ghost" size="sm" onClick={() => setParams({ page: '1' })}>
-            Clear filters
+            <X size={15} aria-hidden="true" /> Clear filters
           </Button>
         )}
       </div>
@@ -125,14 +126,16 @@ export function UserListPage() {
                   <AppLink to={`/users/${user.id}`} className="flex-1 text-[13px] font-bold">
                     View profile <span className="text-lg text-[var(--accent)]">→</span>
                   </AppLink>
-                  <AppLink to={`/users/${user.id}/edit`}>Edit</AppLink>
+                  <AppLink to={`/users/${user.id}/edit`} className="inline-flex items-center gap-1">
+                    <Pencil size={14} aria-hidden="true" /> Edit
+                  </AppLink>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => deleteUser(user)}
                     disabled={deleting === user.id}
                   >
-                    {deleting === user.id ? '...' : 'Delete'}
+                    <Trash2 size={14} aria-hidden="true" /> {deleting === user.id ? '...' : 'Delete'}
                   </Button>
                 </div>
               </Card>

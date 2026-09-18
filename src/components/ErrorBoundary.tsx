@@ -5,9 +5,11 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { hasError
   static getDerivedStateFromError() {
     return { hasError: true };
   }
+
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('Application render error', error, info);
   }
+  
   render() {
     return this.state.hasError ? (
       <main className="flex min-h-screen flex-col items-center justify-center text-center">

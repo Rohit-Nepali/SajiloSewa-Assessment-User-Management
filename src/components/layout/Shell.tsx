@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { Moon, Sun, UserPlus, Users } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { IconButton } from '../shared/IconButton';
 
@@ -15,6 +16,7 @@ function Brand() {
     </NavLink>
   );
 }
+
 function NavItem({ to, children }: { to: string; children: React.ReactNode }) {
   return (
     <NavLink
@@ -39,10 +41,10 @@ export function Shell() {
             Workspace
           </p>
           <NavItem to="/users">
-            <span>◈</span> Directory
+            <Users size={17} aria-hidden="true" /> Directory
           </NavItem>
           <NavItem to="/users/new">
-            <span>＋</span> Add user
+            <UserPlus size={17} aria-hidden="true" /> Add user
           </NavItem>
         </nav>
         <div className="mt-auto">
@@ -51,7 +53,7 @@ export function Shell() {
             onClick={toggleTheme}
             aria-label="Toggle color theme"
           >
-            <span>{theme === 'light' ? '☾' : '☀'}</span>
+            {theme === 'light' ? <Moon size={17} aria-hidden="true" /> : <Sun size={17} aria-hidden="true" />}
             {theme === 'light' ? 'Dark mode' : 'Light mode'}
           </button>
           <div className="mt-[18px] flex items-center gap-2.5 border-t border-[#35433d] pt-5">
@@ -69,7 +71,7 @@ export function Shell() {
         <header className="hidden items-center justify-between px-5 pt-5 max-sm:flex">
           <Brand />
           <IconButton onClick={toggleTheme} aria-label="Toggle color theme">
-            {theme === 'light' ? '☾' : '☀'}
+            {theme === 'light' ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
           </IconButton>
         </header>
         <Outlet />

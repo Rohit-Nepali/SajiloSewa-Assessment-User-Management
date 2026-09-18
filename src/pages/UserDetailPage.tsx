@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { User } from '../types';
 import { userService } from '../services/userService';
@@ -38,7 +39,7 @@ export function UserDetailsPage() {
   return (
     <section className={narrow}>
       <AppLink to="/users" variant="back">
-        ← Back to directory
+        <span className="inline-flex items-center gap-1"><ArrowLeft size={15} aria-hidden="true" /> Back to directory</span>
       </AppLink>
       <div className="flex items-center justify-between gap-[25px] border-b border-[var(--line)] pb-[35px] max-sm:flex-col max-sm:items-start">
         <img
@@ -56,7 +57,7 @@ export function UserDetailsPage() {
           </p>
         </div>
         <AppLink to={`/users/${user.id}/edit`}>
-          <Button variant="secondary">Edit profile</Button>
+          <Button variant="secondary"><Pencil size={16} aria-hidden="true" /> Edit profile</Button>
         </AppLink>
       </div>
       <div className="mt-[25px] grid grid-cols-1 gap-[15px] sm:grid-cols-2">

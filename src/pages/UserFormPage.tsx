@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ArrowLeft, Check, Plus } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { UserInput } from '../types';
 import { userService } from '../services/userService';
@@ -92,7 +93,7 @@ export function UserFormPage({ edit = false }: { edit?: boolean }) {
   return (
     <section className={narrow}>
       <AppLink to="/users" variant="back">
-        ← Back to directory
+        <span className="inline-flex items-center gap-1"><ArrowLeft size={15} aria-hidden="true" /> Back to directory</span>
       </AppLink>
       <div className="flex flex-col items-start gap-2">
         <span className={eyebrow}>Directory / {edit ? 'Edit profile' : 'New profile'}</span>
@@ -158,6 +159,7 @@ export function UserFormPage({ edit = false }: { edit?: boolean }) {
             </Button>
           </AppLink>
           <Button disabled={saving}>
+            {edit ? <Check size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
             {saving ? 'Saving...' : edit ? 'Save changes' : 'Create user'}
           </Button>
         </div>
