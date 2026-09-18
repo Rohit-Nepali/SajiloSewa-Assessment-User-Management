@@ -14,12 +14,10 @@ import { Badge } from '../components/shared/Badge';
 import { IconButton } from '../components/shared/IconButton';
 import { Stat } from '../components/shared/Stat';
 import { Info } from '../components/shared/Info';
+import { Typography } from '../components/shared/Typography';
 
 const page = 'mx-auto w-full max-w-[1180px] px-[6%] py-[62px] max-sm:px-5 max-sm:py-[35px]';
 // const narrow = `${page} max-w-[950px]`;
-const eyebrow = 'text-[11px] font-bold uppercase tracking-[0.12em] text-[#92a19a]';
-const heading =
-  'mb-3 mt-[11px] font-heading text-[clamp(34px,5vw,58px)] leading-none tracking-[-0.04em]';
 
 export function UserListPage() {
   const [params, setParams] = useSearchParams();
@@ -50,11 +48,11 @@ export function UserListPage() {
     <section className={page}>
       <div className="flex items-end justify-between gap-[25px] max-sm:flex-col max-sm:items-start">
         <div>
-          <span className={eyebrow}>People / Directory</span>
-          <h1 className={heading}>All users</h1>
-          <p className="mb-0 text-base text-[var(--muted)]">
+          <Typography size="xs" weight="bold" tone="subtle" className="uppercase tracking-[0.12em]">People / Directory</Typography>
+          <Typography as="h1" size="display" weight="bold" className="mb-3 mt-[11px] font-heading tracking-[-0.04em]">All users</Typography>
+          <Typography tone="muted" className="mb-0">
             A clear view of the people shaping your workspace.
-          </p>
+          </Typography>
         </div>
         <AppLink to="/users/new">
           <Button><UserPlus size={16} aria-hidden="true" /> Add user</Button>
@@ -114,10 +112,10 @@ export function UserListPage() {
                   />
                   <Badge>Active</Badge>
                 </div>
-                <h2 className="mb-[3px] mt-[22px] text-[19px]">
+                <Typography as="h2" size="lg" weight="semibold" className="mb-[3px] mt-[22px]">
                   {user.firstName} {user.lastName}
-                </h2>
-                <p className="text-[13px] text-[var(--muted)]">{user.company.title}</p>
+                </Typography>
+                <Typography size="sm" tone="muted">{user.company.title}</Typography>
                 <dl className="my-5 border-t border-[var(--line)] pt-[13px]">
                   <Info label="Email" value={user.email} />
                   <Info label="Company" value={user.company.name} />

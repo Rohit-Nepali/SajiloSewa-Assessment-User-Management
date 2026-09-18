@@ -8,10 +8,10 @@ import { Button } from '../components/shared/Button';
 import { Info } from '../components/shared/Info';
 import { ErrorState, LoadingState } from '../components/common/States';
 import { InfoBlock } from '../components/shared/InfoBlock';
+import { Typography } from '../components/shared/Typography';
 
 const page = 'mx-auto w-full max-w-[1180px] px-[6%] py-[62px] max-sm:px-5 max-sm:py-[35px]';
 const narrow = `${page} max-w-[950px]`;
-const eyebrow = 'text-[11px] font-bold uppercase tracking-[0.12em] text-[#92a19a]';
 
 export function UserDetailsPage() {
   const { id = '' } = useParams(),
@@ -48,13 +48,13 @@ export function UserDetailsPage() {
           alt={`${user.firstName} ${user.lastName}`}
         />
         <div className="flex-1">
-          <span className={eyebrow}>Profile / {user.username}</span>
-          <h1 className="my-2.5 font-heading text-[44px] leading-none max-sm:text-4xl">
+          <Typography size="xs" weight="bold" tone="subtle" className="uppercase tracking-[0.12em]">Profile / {user.username}</Typography>
+          <Typography as="h1" size="3xl" weight="bold" className="my-2.5 font-heading leading-none max-sm:text-4xl">
             {user.firstName} {user.lastName}
-          </h1>
-          <p className="mb-0 text-[var(--muted)]">
+          </Typography>
+          <Typography tone="muted" className="mb-0">
             {user.company.title} at {user.company.name}
-          </p>
+          </Typography>
         </div>
         <AppLink to={`/users/${user.id}/edit`}>
           <Button variant="secondary"><Pencil size={16} aria-hidden="true" /> Edit profile</Button>

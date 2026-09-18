@@ -9,12 +9,10 @@ import { FormField } from '../components/shared/FormField';
 import { Input } from '../components/shared/Input';
 import { Select } from '../components/shared/Select';
 import { Button } from '../components/shared/Button';
+import { Typography } from '../components/shared/Typography';
 
 const page = 'mx-auto w-full max-w-[1180px] px-[6%] py-[62px] max-sm:px-5 max-sm:py-[35px]';
 const narrow = `${page} max-w-[950px]`;
-const eyebrow = 'text-[11px] font-bold uppercase tracking-[0.12em] text-[#92a19a]';
-// const heading =
-//   'mb-3 mt-[11px] font-heading text-[clamp(34px,5vw,58px)] leading-none tracking-[-0.04em]';
 
 export function UserFormPage({ edit = false }: { edit?: boolean }) {
   const { id = '' } = useParams(),
@@ -96,21 +94,22 @@ export function UserFormPage({ edit = false }: { edit?: boolean }) {
         <span className="inline-flex items-center gap-1"><ArrowLeft size={15} aria-hidden="true" /> Back to directory</span>
       </AppLink>
       <div className="flex flex-col items-start gap-2">
-        <span className={eyebrow}>Directory / {edit ? 'Edit profile' : 'New profile'}</span>
-        <h1 className="mb-0 mt-0 font-heading text-[clamp(34px,5vw,58px)] leading-none">
+        <Typography size="xs" weight="bold" tone="subtle" className="uppercase tracking-[0.12em]">Directory / {edit ? 'Edit profile' : 'New profile'}</Typography>
+        <Typography as="h1" size="display" weight="bold" className="mb-0 mt-0 font-heading">
           {edit ? 'Edit user' : 'Add a new user'}
-        </h1>
-        <p className="mb-0 text-base text-[var(--muted)]">
+        </Typography>
+        <Typography tone="muted" className="mb-0">
           Keep profile information accurate and useful for the whole team.
-        </p>
+        </Typography>
       </div>
       {error && (
-        <p
-          className="mt-[25px] rounded-[6px] bg-[#ffe3df] px-[15px] py-3 text-[#8e3229]"
+        <Typography
+          className="mt-[25px] rounded-[6px] bg-[var(--danger-soft)] px-[15px] py-3"
+          tone="danger"
           role="alert"
         >
           {error}
-        </p>
+        </Typography>
       )}
       <form
         className="mt-[35px] grid grid-cols-2 gap-5 rounded-lg border border-[var(--line)] bg-[var(--panel)] p-7 max-sm:grid-cols-1 max-sm:p-5"
