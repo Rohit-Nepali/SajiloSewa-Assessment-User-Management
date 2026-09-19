@@ -1,4 +1,4 @@
-# Orbit.dir User Management Dashboard
+# Sajilo Sewa User Management Dashboard
 
 A responsive React + TypeScript user directory built for the Sajilo Life assessment. It supports searchable, filterable and paginated users, profile details, add/edit forms, deletion confirmation, loading/error/empty states, routing, and persistent light/dark themes.
 

@@ -27,20 +27,22 @@ function NavItem({ to, children }: { to: string; children: React.ReactNode }) {
 }
 
 export function Shell() {
+  
   const { theme, toggleTheme } = useTheme();
+
   return (
     <div className="flex min-h-screen max-sm:block">
       <aside className="flex w-[245px] shrink-0 flex-col bg-[var(--sidebar)] px-[22px] pb-6 pt-[30px] text-[var(--inverse)] max-lg:w-[210px] max-sm:hidden">
         <Brand />
         <nav className="mt-[65px]">
           <Typography as="p" size="xs" weight="bold" tone="subtle" className="mb-[15px] ml-3.5 uppercase tracking-[0.12em]">
-            Workspace
+            Dashboard
           </Typography>
           <NavItem to="/users">
-            <Users size={17} aria-hidden="true" /> Home
+            <Users size={17} aria-hidden="true" /> Users
           </NavItem>
           <NavItem to="/users/new">
-            <UserPlus size={17} aria-hidden="true" /> Manage Users
+            <UserPlus size={17} aria-hidden="true" /> Add User
           </NavItem>
         </nav>
         <div className="mt-auto">

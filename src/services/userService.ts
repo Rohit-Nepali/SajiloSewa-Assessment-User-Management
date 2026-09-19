@@ -2,7 +2,15 @@ import { apiClient } from './apiClient';
 import type { User, UserInput, UsersResponse } from '../types';
 
 export const userService = {
-  getUsers: (params: { limit: number; skip: number; search?: string; gender?: string }) =>
+  getUsers: (
+    params: {
+      limit: number;
+      skip: number;
+      search?: string;
+      gender?: string;
+    },
+    signal?: AbortSignal,
+  ) =>
     apiClient
       .get<UsersResponse>(
         params.search
@@ -16,6 +24,7 @@ export const userService = {
             skip: params.skip,
             ...(params.search ? { q: params.search } : {}),
           },
+          signal,
         },
       )
       .then((response) => response.data),
