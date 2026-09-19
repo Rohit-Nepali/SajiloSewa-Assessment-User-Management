@@ -86,6 +86,8 @@ export function UserFormPage({ edit = false }: { edit?: boolean }) {
       >
         {fields.map((field) => (
           <FormField
+            id={`user-${field}`}
+            error={errors[field]?.message}
             key={field}
             label={
               field === 'firstName'
@@ -96,28 +98,35 @@ export function UserFormPage({ edit = false }: { edit?: boolean }) {
             }
           >
             <Input
+              id={`user-${field}`}
               type={field === 'email' ? 'email' : 'text'}
-              {...register(field, field === 'firstName' ? userFieldRules.firstName : field === 'lastName' ? userFieldRules.lastName : field === 'email' ? userFieldRules.email : undefined)}
+              aria-describedby={errors[field] ? `user-${field}-error` : undefined}
+              aria-invalid={errors[field] ? 'true' : undefined}
+              {...register(field, userFieldRules[field])}
             />
-            {errors[field] && <Typography size="xs" tone="danger">{errors[field]?.message}</Typography>}
           </FormField>
         ))}
-        <FormField label="Gender">
+        <FormField id="user-gender" label="Gender" error={errors.gender?.message}>
           <Select
-            {...register('gender')}
+            id="user-gender"
+            aria-describedby={errors.gender ? 'user-gender-error' : undefined}
+            aria-invalid={errors.gender ? 'true' : undefined}
+            {...register('gender', userFieldRules.gender)}
           >
-            <option>female</option>
-            <option>male</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
           </Select>
         </FormField>
-        <FormField label="Age">
+        <FormField id="user-age" label="Age" error={errors.age?.message}>
           <Input
+            id="user-age"
             type="number"
             min="1"
             max="120"
-            {...register('age', { valueAsNumber: true, min: { value: 1, message: 'Age must be at least 1.' }, max: { value: 120, message: 'Age must be 120 or less.' } })}
+            aria-describedby={errors.age ? 'user-age-error' : undefined}
+            aria-invalid={errors.age ? 'true' : undefined}
+            {...register('age', userFieldRules.age)}
           />
-          {errors.age && <Typography size="xs" tone="danger">{errors.age.message}</Typography>}
         </FormField>
         <div className="col-span-full mt-2 flex items-center justify-end gap-2.5 border-t border-[var(--line)] pt-5">
           <AppLink to="/users">

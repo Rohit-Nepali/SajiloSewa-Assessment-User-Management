@@ -6,6 +6,8 @@ import { Button } from '../shared/Button';
 import { Input } from '../shared/Input';
 import { Select } from '../shared/Select';
 import { Typography } from '../shared/Typography';
+import { FormField } from '../shared/FormField';
+import { UserAvatar } from './UserAvatar';
 import { useCreateUser, useDeleteUser, useUpdateUser } from '../../hooks/useUserMutations';
 import {
   formValuesToUserInput,
@@ -112,35 +114,22 @@ export function UserPanel({
   };
 
   const field = (label: string, key: keyof UserFormValues, fullWidth = false) => (
-    <label className={`${fullWidth ? 'sm:col-span-2' : ''} flex flex-col gap-1.5`}>
-      <Typography as="span" size="xs" weight="semibold" tone="muted">
-        {label}
-      </Typography>
+    <FormField
+      id={`panel-${key}`}
+      label={label}
+      error={errors[key]?.message}
+      className={fullWidth ? 'sm:col-span-2' : ''}
+    >
       <Input
+        id={`panel-${key}`}
         type={key === 'age' ? 'number' : key === 'email' ? 'email' : 'text'}
-        {...register(
-          key,
-          key === 'firstName'
-            ? userFieldRules.firstName
-            : key === 'lastName'
-              ? userFieldRules.lastName
-              : key === 'email'
-                ? userFieldRules.email
-                : key === 'age'
-                  ? {
-                      valueAsNumber: true,
-                      min: { value: 1, message: 'Age must be at least 1.' },
-                      max: { value: 120, message: 'Age must be 120 or less.' },
-                    }
-                  : undefined,
-        )}
+        min={key === 'age' ? 1 : undefined}
+        max={key === 'age' ? 120 : undefined}
+        aria-describedby={errors[key] ? `panel-${key}-error` : undefined}
+        aria-invalid={errors[key] ? 'true' : undefined}
+        {...register(key, userFieldRules[key])}
       />
-      {errors[key] && (
-        <Typography size="xs" tone="danger">
-          {errors[key]?.message}
-        </Typography>
-      )}
-    </label>
+    </FormField>
   );
 
   return (
@@ -164,10 +153,7 @@ export function UserPanel({
         <div className="flex items-start justify-between border-b border-[var(--line)] px-6 py-5">
           <div className="flex min-w-0 items-center gap-3">
             {displayUser ? (
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--soft)] font-bold text-[var(--ink)]">
-                {displayUser.firstName[0]}
-                {displayUser.lastName[0]}
-              </div>
+              <UserAvatar key={displayUser.id} user={displayUser} className="h-11 w-11 shrink-0 rounded-full" />
             ) : (
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--soft)] text-[var(--accent)]">
                 <Pencil size={18} />
@@ -191,10 +177,10 @@ export function UserPanel({
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
+        <form id="user-panel-form" className="min-h-0 flex-1 overflow-y-auto px-6 py-5" onSubmit={handleSubmit(save)}>
           {mode === 'view' ? (
             <>
-              <Button size="sm" variant="secondary" onClick={() => setMode('edit')}>
+              <Button type="button" size="sm" variant="secondary" onClick={() => setMode('edit')}>
                 <Pencil size={14} /> Edit details
               </Button>
               <Typography as="h3" size="sm" weight="bold" className="mb-3 mt-6">
@@ -254,25 +240,29 @@ export function UserPanel({
                 {field('Phone', 'phone')}
                 {field('Username', 'username')}
                 {field('Company', 'company', true)}
-                <label className="flex flex-col gap-1.5">
-                  <Typography as="span" size="xs" weight="semibold" tone="muted">
-                    Gender
-                  </Typography>
-                  <Select {...register('gender')}>
+                <FormField id="panel-gender" label="Gender" error={errors.gender?.message}>
+                  <Select
+                    id="panel-gender"
+                    aria-describedby={errors.gender ? 'panel-gender-error' : undefined}
+                    aria-invalid={errors.gender ? 'true' : undefined}
+                    {...register('gender', userFieldRules.gender)}
+                  >
                     <option value="female">Female</option>
                     <option value="male">Male</option>
                   </Select>
-                </label>
+                </FormField>
                 {field('Age', 'age')}
-                <label className="flex flex-col gap-1.5 sm:col-span-2">
-                  <Typography as="span" size="xs" weight="semibold" tone="muted">
-                    Status
-                  </Typography>
-                  <Select {...register('status')}>
+                <FormField id="panel-status" label="Status" error={errors.status?.message}>
+                  <Select
+                    id="panel-status"
+                    aria-describedby={errors.status ? 'panel-status-error' : undefined}
+                    aria-invalid={errors.status ? 'true' : undefined}
+                    {...register('status', userFieldRules.status)}
+                  >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                   </Select>
-                </label>
+                </FormField>
               </div>
               {error && (
                 <Typography
@@ -288,7 +278,7 @@ export function UserPanel({
           )}
 
           {!isNew && mode === 'view' && (
-            <div className="mt-8 border-t border-[var(--line)] pt-5">
+            <div className="mt-1 pt-4">
               <Typography as="h3" size="sm" weight="bold" tone="danger">
                 Danger zone
               </Typography>
@@ -297,6 +287,7 @@ export function UserPanel({
               </Typography>
               {!confirmDelete ? (
                 <Button
+                    type="button"
                   variant="destructive"
                   size="sm"
                   className="mt-4"
@@ -318,7 +309,7 @@ export function UserPanel({
                     >
                       <Trash2 size={14} /> Yes, delete
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(false)}>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setConfirmDelete(false)}>
                       Cancel
                     </Button>
                   </div>
@@ -326,18 +317,19 @@ export function UserPanel({
               )}
             </div>
           )}
-        </div>
+        </form>
 
         {mode === 'edit' && (
           <div className="flex justify-end gap-2 border-t border-[var(--line)] bg-[var(--panel)] px-6 py-4">
-            <Button variant="ghost" onClick={() => (isNew ? onClose() : setMode('view'))}>
+            <Button type="button" variant="ghost" onClick={() => (isNew ? onClose() : setMode('view'))}>
               Cancel
             </Button>
             <Button
-              onClick={handleSubmit(save)}
+              type="submit"
+              form="user-panel-form"
               disabled={createUser.isPending || updateUser.isPending}
             >
-              <Check size={15} />{' '}
+              <Check size={15} className="mr-1" />
               {createUser.isPending || updateUser.isPending ? 'Saving...' : 'Save changes'}
             </Button>
           </div>

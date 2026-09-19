@@ -11,15 +11,12 @@ import { EmptyState, ErrorState, LoadingState } from '../components/common/State
 import { IconButton } from '../components/shared/IconButton';
 import { Typography } from '../components/shared/Typography';
 import { UserPanel } from '../components/users/UserPanel';
+import { UserAvatar } from '../components/users/UserAvatar';
 import { getUserStatus } from '../hooks/userStatus';
 
 const page = 'mx-auto w-full max-w-[1180px] px-6 sm:px-8 lg:px-4 py-8 sm:py-12 lg:py-16';
 
 type PanelAction = 'view' | 'edit' | 'delete';
-
-function initials(user: User) {
-  return `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase();
-}
 
 export function UserListPage() {
   const [params, setParams] = useSearchParams();
@@ -153,7 +150,7 @@ export function UserListPage() {
         </div>
 
         <Button onClick={() => openPanel(null, 'edit')}>
-          <UserPlus size={16} aria-hidden="true" />
+          <UserPlus size={16} aria-hidden="true"  className="mr-2"/>
           Add user
         </Button>
       </div>
@@ -362,9 +359,7 @@ export function UserListPage() {
 
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--soft)] text-xs font-bold text-[var(--accent)]">
-                            {initials(user)}
-                          </span>
+                          <UserAvatar user={user} className="h-9 w-9 shrink-0 rounded-full" />
 
                           <span className="min-w-0">
                             <Typography
